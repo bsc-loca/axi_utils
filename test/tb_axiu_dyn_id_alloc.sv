@@ -32,26 +32,34 @@ module tb_axiu_dyn_id_alloc();
     localparam WRITE_BANDWIDTH_UP_PROB = 0;
     localparam WRITE_BANDWIDTH_DOWN_PROB = 0;
     localparam TIMER_WIDTH = 64;
+    localparam AXI_DATA_WIDTH = 128;
+    localparam AXI_ID_SLV_WIDTH = 4;
+    localparam AXI_MST_UNIQUE_IDS = 8;
+    localparam AXI_ID_MST_WIDTH = $clog2(AXI_MST_UNIQUE_IDS);
     
     AXI_BUS #(
         .AXI_ADDR_WIDTH(32),
-        .AXI_DATA_WIDTH(64),
-        .AXI_ID_WIDTH(4),
+        .AXI_DATA_WIDTH(AXI_DATA_WIDTH),
+        .AXI_ID_WIDTH(AXI_ID_SLV_WIDTH),
         .AXI_USER_WIDTH(1)
     ) axi_driver2dly(),
       axi_dly2idalloc();
     
     AXI_BUS #(
         .AXI_ADDR_WIDTH(32),
-        .AXI_DATA_WIDTH(64),
-        .AXI_ID_WIDTH(3),
+        .AXI_DATA_WIDTH(AXI_DATA_WIDTH),
+        .AXI_ID_WIDTH(AXI_ID_MST_WIDTH),
         .AXI_USER_WIDTH(1)
     ) axi_idalloc2dly(),
       axi_dly2cut(),
       axi_cut2stub();
     
-    axi_driver #(
-        .AXI_DATA_WIDTH(64)
+    axiu_driver #(
+        .AXI_DATA_WIDTH(AXI_DATA_WIDTH),
+        .AXI_ID_RANGE_LOW(0),
+        .AXI_ID_RANGE_HIGH((2**AXI_ID_SLV_WIDTH)-1),
+        .AXI_LEN_RANGE_LOW(0),
+        .AXI_LEN_RANGE_HIGH(64/(AXI_DATA_WIDTH/8)-1)
     ) axi_driver_I (
         .clk(clk),
         .rstn(rstn),
@@ -83,8 +91,8 @@ module tb_axiu_dyn_id_alloc();
     );
     
     axiu_dyn_id_alloc #(
-        .SLV_AXI_ID_WIDTH(4),
-        .MST_UNIQUE_IDS(8),
+        .SLV_AXI_ID_WIDTH(AXI_ID_SLV_WIDTH),
+        .MST_UNIQUE_IDS(AXI_MST_UNIQUE_IDS),
         .MAX_TXNS_PER_ID(8)
     ) axiu_dyn_id_alloc_I (
         .clk(clk),
@@ -119,8 +127,8 @@ module tb_axiu_dyn_id_alloc();
     
     axi_cut_intf #(
         .ADDR_WIDTH(32),
-        .DATA_WIDTH(64),
-        .ID_WIDTH(3),
+        .DATA_WIDTH(AXI_DATA_WIDTH),
+        .ID_WIDTH(AXI_ID_MST_WIDTH),
         .USER_WIDTH(1)
     ) axi_cut_I (
         .clk_i(clk),
@@ -130,8 +138,8 @@ module tb_axiu_dyn_id_alloc();
     );
     
     axiu_dyn_id_alloc_check #(
-        .SLV_AXI_ID_WIDTH(4),
-        .MST_UNIQUE_IDS(8)
+        .SLV_AXI_ID_WIDTH(AXI_ID_SLV_WIDTH),
+        .MST_UNIQUE_IDS(AXI_MST_UNIQUE_IDS)
     ) axiu_dyn_id_alloc_check_I (
         .clk(clk),
         .rstn(rstn),
@@ -142,8 +150,8 @@ module tb_axiu_dyn_id_alloc();
         .MAX_OUTSTANDING_AW(64),
         .MAX_OUTSTANDING_W(64),
         .MAX_OUTSTANDING_R(64),
-        .AXI_ID_WIDTH(3),
-        .AXI_DATA_WIDTH(64),
+        .AXI_ID_WIDTH(AXI_ID_MST_WIDTH),
+        .AXI_DATA_WIDTH(AXI_DATA_WIDTH),
         .AXI_ADDR_WIDTH(32),
         .RANDOMIZE_RDATA(1),
         .RANDOMIZE_RESP(1)

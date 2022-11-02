@@ -8,7 +8,7 @@ module axiu_dyn_id_alloc_check #(
     AXI_BUS.Monitor axi
 );
 
-    import SerdesAxiSim::*;
+    import AxiUtilsSim::*;
     
     typedef struct {
         int q[$];
