@@ -47,10 +47,10 @@ module axiu_dyn_id_alloc_channel #(
         assign id_min_size_mat[0][i] = i;
     end
     
-    for (genvar i = 1; i <= $clog2(MST_UNIQUE_IDS); ++i) begin
+    for (genvar i = 1; i <= $clog2(MST_UNIQUE_IDS); ++i) begin : min_size_outer
         localparam divisor = 2**i;
-    
-        for (genvar j = 0; j < MST_UNIQUE_IDS/divisor; ++j) begin
+
+        for (genvar j = 0; j < MST_UNIQUE_IDS/divisor; ++j) begin : min_size_inner
             wire left_condition;
             assign left_condition = min_size_mat[i-1][j*2] > min_size_mat[i-1][j*2+1];
             assign min_size_mat[i][j] = left_condition ? min_size_mat[i-1][j*2+1] : min_size_mat[i-1][j*2];

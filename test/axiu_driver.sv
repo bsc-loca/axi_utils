@@ -4,7 +4,9 @@ module axiu_driver #(
     parameter AXI_ID_RANGE_LOW = 0,
     parameter AXI_ID_RANGE_HIGH = 0,
     parameter AXI_LEN_RANGE_LOW = 0,
-    parameter AXI_LEN_RANGE_HIGH = 255
+    parameter AXI_LEN_RANGE_HIGH = 255,
+    parameter AXI_SIZE_RANGE_LOW = 0,
+    parameter AXI_SIZE_RANGE_HIGH = $clog2(AXI_DATA_WIDTH/8)
 ) (
     input clk,
     input rstn,
@@ -34,7 +36,7 @@ module axiu_driver #(
         cmd.addr = $urandom;
         cmd.id = $urandom_range(AXI_ID_RANGE_LOW, AXI_ID_RANGE_HIGH);
         cmd.len = $urandom_range(AXI_LEN_RANGE_LOW, AXI_LEN_RANGE_HIGH);
-        cmd.size = $urandom_range(0, $clog2(AXI_DATA_WIDTH/8));
+        cmd.size = $urandom_range(AXI_SIZE_RANGE_LOW, AXI_SIZE_RANGE_HIGH);
         cmd.burst = $urandom;
         cmd.lock = $urandom;
         cmd.cache = $urandom;
