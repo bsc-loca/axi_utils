@@ -24,7 +24,7 @@ module axiu_id_deserialize_channel #(
 
     AxiUtilsFifo #(.WIDTH(DATA_WIDTH)) data_fifo[MST_UNIQUE_IDS]();
     AxiUtilsFifo #(.WIDTH(AXI_ID_WIDTH)) id_fifo();
-    
+
     wire [DATA_WIDTH-1:0] slv_data[MST_UNIQUE_IDS];
     wire [MST_UNIQUE_IDS-1:0] data_fifo_empty;
     wire [MST_UNIQUE_IDS-1:0] data_fifo_read;
@@ -39,11 +39,11 @@ module axiu_id_deserialize_channel #(
         .arstn(arstn),
         .port(id_fifo)
     );
-    
+
     assign req_id = sel_id;
     assign slv_resp_valid = !id_fifo.empty && !data_fifo_empty[id_fifo.dout];
     assign slv_resp_data = slv_data[id_fifo.dout];
-    
+
     assign id_fifo.write = req_valid;
     assign id_fifo.din = sel_id;
     assign id_fifo.read = slv_resp_ready && !id_fifo.empty && !data_fifo_empty[id_fifo.dout] && slv_resp_last;
@@ -57,16 +57,16 @@ module axiu_id_deserialize_channel #(
             .arstn(arstn),
             .port(data_fifo[i])
         );
-        
+
         assign data_fifo[i].write = mst_resp_valid && mst_resp_id == i;
         assign data_fifo[i].din = mst_resp_data;
         assign data_fifo[i].read = slv_resp_ready && id_fifo.dout == i && !data_fifo[i].empty;
-        
+
         assign slv_data[i] = data_fifo[i].dout;
         assign data_fifo_empty[i] = data_fifo[i].empty;
         assign data_fifo_read[i] = data_fifo[i].read;
     end
-    
+
     always_comb begin
         sel_id = '0;
         if (id_outstanding[0] == MAX_TXNS_PER_ID) begin

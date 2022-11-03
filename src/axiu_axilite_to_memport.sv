@@ -10,7 +10,7 @@ module axiu_axilite_to_memport #(
     output [ADDR_WIDTH-1:0] memport_addr,
     output [31:0] memport_din,
     input  [31:0] memport_dout
-    
+
 );
 
     typedef enum bit [1:0] {

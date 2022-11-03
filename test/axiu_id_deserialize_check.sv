@@ -8,23 +8,23 @@ module axiu_id_deserialize_check #(
 );
 
     import AxiUtilsSim::*;
-    
+
     localparam AXI_ID_WIDTH = $clog2(MST_UNIQUE_IDS);
-    
+
     typedef struct {
         DataBeat_t q[$];
     } RQueue_t;
-    
+
     typedef struct {
         int q[$];
     } WQueue_t;
-    
+
     int r_id_fifo[$];
     int w_id_fifo[$];
-    
+
     RQueue_t rdata_fifo[MST_UNIQUE_IDS];
     WQueue_t wdata_fifo[MST_UNIQUE_IDS];
-    
+
     always_ff @(posedge clk) begin
         assert (!rstn || (axi.ar_valid !== 1'bX && axi.aw_valid !== 1'bX && axi.w_valid !== 1'bX && axi.r_ready !== 1'bX && axi.b_ready !== 1'bX)) else begin
             $error("X in ar valid"); $fatal;
@@ -34,7 +34,7 @@ module axiu_id_deserialize_check #(
             assert (glb_ar_queue.size() != 0) else begin
                 $error("Received addr command but queue is empty"); $fatal;
             end
-            
+
             cmd = glb_ar_queue.pop_front();
             assert (cmd.addr   == axi.ar_addr &&
                     cmd.len    == axi.ar_len &&
@@ -46,7 +46,7 @@ module axiu_id_deserialize_check #(
                     cmd.region == axi.ar_region) else begin
                 $error("Wrong addr cmd"); $fatal;
             end
-            
+
             assert (axi.ar_id < MST_UNIQUE_IDS) else begin
                 $error("Invalid id"); $fatal;
             end
@@ -57,7 +57,7 @@ module axiu_id_deserialize_check #(
             assert (glb_aw_queue.size() != 0) else begin
                 $error("Received addr command but queue is empty"); $fatal;
             end
-            
+
             cmd = glb_aw_queue.pop_front();
             glb_w_addr_queue.pop_front();
             assert (cmd.addr   == axi.aw_addr &&
@@ -74,7 +74,7 @@ module axiu_id_deserialize_check #(
             assert (axi.aw_id < MST_UNIQUE_IDS) else begin
                 $error("Invalid id"); $fatal;
             end
-            
+
             w_id_fifo.push_back(axi.aw_id);
         end
         if (axi.r_valid && axi.r_ready) begin
@@ -99,7 +99,7 @@ module axiu_id_deserialize_check #(
             assert (data_beat.data == axi.w_data &&
                     data_beat.wstrb == axi.w_strb &&
                     data_beat.last == axi.w_last) else begin
-               $error("Invalid W channel data"); $fatal;     
+               $error("Invalid W channel data"); $fatal;
             end
         end
         if (axi.b_valid && axi.b_ready) begin

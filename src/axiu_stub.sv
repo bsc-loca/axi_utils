@@ -49,7 +49,7 @@ module axiu_stub #(
     wire aw_fifo_rd_en;
 
     AxiUtilsFifo #(.WIDTH(1)) w_fifo();
-    
+
     reg [7:0] read_count;
 
     assign slv.ar_ready = !read_fifo_full;
@@ -110,7 +110,7 @@ module axiu_stub #(
             end
         end
     end
-    
+
     axiu_reorder_buffer_fallthrough #(
         .LEN(MAX_OUTSTANDING_R),
         .WIDTH(8),
@@ -144,7 +144,7 @@ module axiu_stub #(
         .dout(),
         .id_out(aw_fifo_id_out)
     );
-    
+
     axiu_fifo_fallthrough #(
         .LEN(MAX_OUTSTANDING_W),
         .WIDTH(1)

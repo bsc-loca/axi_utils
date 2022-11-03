@@ -22,11 +22,11 @@ module axiu_reorder_buffer_fallthrough #(
 
     int size = 0;
     reg [ID_WIDTH-1:0] rand_id;
-    
+
     int rand_idx;
     bit [ID_WIDTH-1:0] id_set[$];
     IDQueue_t dict[int];
-    
+
     assign full = size == LEN;
     assign empty = size == 0;
     assign id_out = rand_id;

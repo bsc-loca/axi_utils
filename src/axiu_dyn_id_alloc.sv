@@ -40,19 +40,19 @@ module axiu_dyn_id_alloc #(
     assign mst.aw_prot   = slv.aw_prot;
     assign mst.aw_qos    = slv.aw_qos;
     assign mst.aw_region = slv.aw_region;
-    
+
     assign mst.w_valid = slv.w_valid;
     assign slv.w_ready = mst.w_ready;
     assign mst.w_data = slv.w_data;
     assign mst.w_strb = slv.w_strb;
     assign mst.w_last = slv.w_last;
-    
+
     assign slv.r_valid = mst.r_valid;
     assign mst.r_ready = slv.r_ready;
     assign slv.r_data = mst.r_data;
     assign slv.r_resp = mst.r_resp;
     assign slv.r_last = mst.r_last;
-    
+
     assign slv.b_valid = mst.b_valid;
     assign mst.b_ready = slv.b_ready;
     assign slv.b_resp = mst.b_resp;
@@ -106,5 +106,5 @@ module axiu_dyn_id_alloc #(
             end
         end
     end
-   
+
 endmodule

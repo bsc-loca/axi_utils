@@ -46,17 +46,17 @@ module axiu_driver #(
 
         return cmd;
     endfunction
-    
+
     function int getAlignment(int addr);
         int alignment;
         int mask;
         int bytes_per_word;
         bytes_per_word = AXI_DATA_WIDTH/8;
         mask = -1 << $clog2(bytes_per_word);
-        
+
         return addr & ~mask;
     endfunction
-    
+
     function bit [AXI_DATA_WIDTH-1:0] genRandData();
         bit [AXI_DATA_WIDTH-1:0] data;
         for (int i = 0; i < AXI_DATA_WIDTH; i += 32) begin
@@ -64,7 +64,7 @@ module axiu_driver #(
         end
         return data;
     endfunction
-    
+
     function bit [AXI_DATA_WIDTH/8-1:0] genRandWstrb(int alignment, int burst_size);
         bit [AXI_DATA_WIDTH/8-1:0] data;
         int size;
@@ -262,7 +262,7 @@ module axiu_driver #(
                         data_beat.last = w_count == 1;
                         glb_w_queue.push_back(data_beat);
                         wstrb <= rand_wstrb;
-                        
+
                     end
                 end
             end

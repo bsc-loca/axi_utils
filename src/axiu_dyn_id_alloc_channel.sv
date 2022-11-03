@@ -27,27 +27,27 @@ module axiu_dyn_id_alloc_channel #(
     wire [MST_AXI_ID_WIDTH-1:0] sel_dyn_id;
     reg [MAX_OUTSTANDING_REQ_WIDTH-1:0] req_id_outstanding_req[SLV_UNIQUE_IDS];
     reg [MST_AXI_ID_WIDTH-1:0] req_id_map[SLV_UNIQUE_IDS];
-    
+
     AxiUtilsFifo #(.WIDTH(SLV_AXI_ID_WIDTH)) id_fifo_ports[MST_UNIQUE_IDS]();
-    
+
     reg [MAX_OUTSTANDING_REQ_WIDTH-1:0] fifo_size[MST_UNIQUE_IDS];
     wire [MAX_OUTSTANDING_REQ_WIDTH-1:0] min_size_mat[$clog2(MST_UNIQUE_IDS)+1][MST_UNIQUE_IDS];
     wire [MST_AXI_ID_WIDTH-1:0] id_min_size_mat[$clog2(MST_UNIQUE_IDS)+1][MST_UNIQUE_IDS];
-    
+
     assign req_id_match = req_id_outstanding_req[req_id] != '0;
     assign resp_id_mapped = id_fifo_dout[resp_id];
     assign req_ready = !(&id_fifo_full) && (!req_id_match || !id_fifo_full[req_id_map[req_id]]);
-    
+
     assign incr_outstanding_req = req_valid && req_ready;
     assign decr_outstanding_req = resp_valid;
-    
+
     assign req_id_mapped = req_id_match ? req_id_map[req_id] : sel_dyn_id;
 
     for (genvar i = 0; i < MST_UNIQUE_IDS; ++i) begin
         assign min_size_mat[0][i] = fifo_size[i];
         assign id_min_size_mat[0][i] = i;
     end
-    
+
     for (genvar i = 1; i <= $clog2(MST_UNIQUE_IDS); ++i) begin : min_size_outer
         localparam divisor = 2**i;
 
@@ -75,16 +75,16 @@ module axiu_dyn_id_alloc_channel #(
             .arstn(arstn),
             .port(id_fifo_ports[i])
         );
-        
+
         assign id_fifo_full[i] = id_fifo_ports[i].full;
         assign id_fifo_dout[i] = id_fifo_ports[i].dout;
         assign id_fifo_ports[i].din = req_id;
         assign id_fifo_ports[i].read = resp_valid && resp_id == i;
-        
+
         always_comb begin
             id_fifo_ports[i].write = req_valid && !id_fifo_ports[i].full && ((!req_id_match && sel_dyn_id == i) || (req_id_match && req_id_map[req_id] == i));
         end
-        
+
         always_ff @(posedge clk or negedge arstn) begin
             if (!arstn) begin
                 fifo_size[i] <= '0;
@@ -97,7 +97,7 @@ module axiu_dyn_id_alloc_channel #(
             end
         end
     end
-    
+
     always_ff @(posedge clk or negedge arstn) begin
         if (!arstn) begin
             for (int i = 0; i < SLV_UNIQUE_IDS; ++i) begin

@@ -114,7 +114,7 @@ module axiu_delayer #(
         if (!arstn) begin
             read_state <= READ_IDLE;
         end else begin
-        
+
         case (read_state)
 
             READ_IDLE: begin
@@ -177,7 +177,7 @@ module axiu_delayer #(
             end
 
         endcase
-        
+
         end
     end
 
@@ -195,7 +195,7 @@ module axiu_delayer #(
             bandwidth_write_up_count <= 0;
             write_state <= WRITE_DATA;
         end else begin
-    
+
         case (write_state)
 
             WRITE_DATA: begin
@@ -295,7 +295,7 @@ module axiu_delayer #(
         .arstn(arstn),
         .port(aw_fifo_port)
     );
-    
+
     axiu_fifo_fallthrough #(
         .LEN(MAX_OUTSTANDING_W),
         .WIDTH(TIMER_WIDTH)

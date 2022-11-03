@@ -9,11 +9,11 @@ module axiu_dyn_id_alloc_check #(
 );
 
     import AxiUtilsSim::*;
-    
+
     typedef struct {
         int q[$];
     } Queue_t;
-    
+
     Queue_t r_id_queues[MST_UNIQUE_IDS];
     int r_id_map[2**SLV_AXI_ID_WIDTH];
     int r_outstanding_id_req[2**SLV_AXI_ID_WIDTH];
@@ -31,7 +31,7 @@ module axiu_dyn_id_alloc_check #(
             assert (glb_ar_queue.size() != 0) else begin
                 $error("Received addr command but queue is empty"); $fatal;
             end
-            
+
             cmd = glb_ar_queue.pop_front();
             assert (cmd.addr   == axi.ar_addr &&
                     cmd.len    == axi.ar_len &&
@@ -43,14 +43,14 @@ module axiu_dyn_id_alloc_check #(
                     cmd.region == axi.ar_region) else begin
                 $error("Wrong addr cmd"); $fatal;
             end
-            
+
             assert (axi.ar_id < MST_UNIQUE_IDS) else begin
                 $error("Invalid id"); $fatal;
             end
             assert (r_outstanding_id_req[cmd.id] == 0 || r_id_map[cmd.id] == axi.ar_id) else begin
                 $error("Same original ID mapped to two different outstanding IDs"); $fatal;
             end
-            
+
             ++r_outstanding_id_req[cmd.id];
             r_id_queues[axi.ar_id].q.push_back(cmd.id);
             r_id_map[cmd.id] = axi.ar_id;
@@ -60,7 +60,7 @@ module axiu_dyn_id_alloc_check #(
             assert (glb_aw_queue.size() != 0) else begin
                 $error("Received addr command but queue is empty"); $fatal;
             end
-            
+
             cmd = glb_aw_queue.pop_front();
             glb_w_addr_queue.pop_front();
             assert (cmd.addr   == axi.aw_addr &&
@@ -92,7 +92,7 @@ module axiu_dyn_id_alloc_check #(
             data_beat.last = axi.r_last;
             data_beat.id = r_id_queues[axi.r_id].q[0];
             glb_r_queue.push_back(data_beat);
-            
+
             if (axi.r_last) begin
                 --r_outstanding_id_req[r_id_queues[axi.r_id].q[0]];
                 r_id_queues[axi.r_id].q.pop_front();
@@ -104,10 +104,10 @@ module axiu_dyn_id_alloc_check #(
             assert (data_beat.data == axi.w_data &&
                     data_beat.wstrb == axi.w_strb &&
                     data_beat.last == axi.w_last) else begin
-               $error("Invalid W channel data"); $fatal;     
+               $error("Invalid W channel data"); $fatal;
             end
         end
-        
+
         if (axi.b_valid && axi.b_ready) begin
             WrespBeat_t wresp_beat;
             wresp_beat.id = w_id_queues[axi.b_id].q[0];
