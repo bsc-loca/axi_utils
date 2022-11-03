@@ -91,7 +91,7 @@ module tb_axiu_dyn_id_alloc();
     );
     
     axiu_dyn_id_alloc #(
-        .SLV_AXI_ID_WIDTH(AXI_ID_SLV_WIDTH),
+        .SLV_UNIQUE_IDS(2**AXI_ID_SLV_WIDTH),
         .MST_UNIQUE_IDS(AXI_MST_UNIQUE_IDS),
         .MAX_TXNS_PER_ID(8)
     ) axiu_dyn_id_alloc_I (

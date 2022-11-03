@@ -1,6 +1,6 @@
 
 module axiu_dyn_id_alloc #(
-    parameter SLV_AXI_ID_WIDTH = 0,
+    parameter SLV_UNIQUE_IDS = 0,
     parameter MST_UNIQUE_IDS = 0,
     parameter MAX_TXNS_PER_ID = 0
 ) (
@@ -58,7 +58,7 @@ module axiu_dyn_id_alloc #(
     assign slv.b_resp = mst.b_resp;
 
     axiu_dyn_id_alloc_channel #(
-        .SLV_AXI_ID_WIDTH(SLV_AXI_ID_WIDTH),
+        .SLV_UNIQUE_IDS(SLV_UNIQUE_IDS),
         .MST_UNIQUE_IDS(MST_UNIQUE_IDS),
         .MAX_TXNS_PER_ID(MAX_TXNS_PER_ID)
     ) dyn_id_alloc_R_channel (
@@ -74,7 +74,7 @@ module axiu_dyn_id_alloc #(
     );
 
     axiu_dyn_id_alloc_channel #(
-        .SLV_AXI_ID_WIDTH(SLV_AXI_ID_WIDTH),
+        .SLV_UNIQUE_IDS(SLV_UNIQUE_IDS),
         .MST_UNIQUE_IDS(MST_UNIQUE_IDS),
         .MAX_TXNS_PER_ID(MAX_TXNS_PER_ID)
     ) dyn_id_alloc_W_channel (

@@ -1,8 +1,9 @@
 
 module axiu_dyn_id_alloc_channel #(
-    parameter SLV_AXI_ID_WIDTH = 0,
+    parameter SLV_UNIQUE_IDS = 0,
     parameter MST_UNIQUE_IDS = 0,
     parameter MAX_TXNS_PER_ID = 0,
+    localparam SLV_AXI_ID_WIDTH = $clog2(SLV_UNIQUE_IDS),
     localparam MST_AXI_ID_WIDTH = $clog2(MST_UNIQUE_IDS)
 ) (
     input clk,
@@ -24,8 +25,8 @@ module axiu_dyn_id_alloc_channel #(
     wire [MST_UNIQUE_IDS-1:0] id_fifo_full;
     wire [SLV_AXI_ID_WIDTH-1:0] id_fifo_dout[MST_UNIQUE_IDS];
     wire [MST_AXI_ID_WIDTH-1:0] sel_dyn_id;
-    reg [MAX_OUTSTANDING_REQ_WIDTH-1:0] req_id_outstanding_req[2**SLV_AXI_ID_WIDTH];
-    reg [MST_AXI_ID_WIDTH-1:0] req_id_map[2**SLV_AXI_ID_WIDTH];
+    reg [MAX_OUTSTANDING_REQ_WIDTH-1:0] req_id_outstanding_req[SLV_UNIQUE_IDS];
+    reg [MST_AXI_ID_WIDTH-1:0] req_id_map[SLV_UNIQUE_IDS];
     
     AxiUtilsFifo #(.WIDTH(SLV_AXI_ID_WIDTH)) id_fifo_ports[MST_UNIQUE_IDS]();
     
@@ -99,7 +100,7 @@ module axiu_dyn_id_alloc_channel #(
     
     always_ff @(posedge clk or negedge arstn) begin
         if (!arstn) begin
-            for (int i = 0; i < 2**SLV_AXI_ID_WIDTH; ++i) begin
+            for (int i = 0; i < SLV_UNIQUE_IDS; ++i) begin
                 req_id_outstanding_req[i] <= '0;
             end
         end else begin
