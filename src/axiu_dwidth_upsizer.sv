@@ -3,7 +3,10 @@ module axiu_dwidth_upsizer #(
     parameter AXI_ID_WIDTH = 0,
     parameter MAX_OUTSTANDING_REQ = 0,
     parameter AXI_SLV_DATA_WIDTH = 0,
-    parameter AXI_MST_DATA_WIDTH = 0
+    parameter AXI_MST_DATA_WIDTH = 0,
+    parameter MAX_TXNS_PER_ID = 0,
+    parameter UNIQUE_IDS = 0,
+    parameter QUEUE_PER_ID = 1
 ) (
     input clk,
     input arstn,
@@ -156,21 +159,40 @@ module axiu_dwidth_upsizer #(
     assign next_r_align_state = r_align_state + r_burst_size;
     assign r_align_overflow = next_r_align_state[MST_ALIGN_BITS];
 
-    axiu_reorder_id_fifo #(
-        .LEN(MAX_OUTSTANDING_REQ),
-        .AXI_ID_WIDTH(AXI_ID_WIDTH),
-        .WIDTH($bits(RAlignInfo_t))
-    ) reorder_axi_id_fifo_I (
-        .clk(clk),
-        .arstn(arstn),
-        .full(ar_align_fifo_full),
-        .write(ar_align_fifo_write),
-        .din_id(slv.ar_id),
-        .din(ar_align_fifo_din),
-        .read(ar_align_fifo_read),
-        .dout_id(mst.r_id),
-        .dout(ar_align_fifo_dout)
-    );
+    if (QUEUE_PER_ID) begin : multi_fifo
+        axiu_reorder_id_multififo #(
+            .LEN(MAX_TXNS_PER_ID),
+            .AXI_ID_WIDTH(AXI_ID_WIDTH),
+            .WIDTH($bits(RAlignInfo_t)),
+            .UNIQUE_IDS(UNIQUE_IDS)
+        ) reorder_axi_id_multififo_I (
+            .clk(clk),
+            .arstn(arstn),
+            .full(ar_align_fifo_full),
+            .write(ar_align_fifo_write),
+            .din_id(slv.ar_id),
+            .din(ar_align_fifo_din),
+            .read(ar_align_fifo_read),
+            .dout_id(mst.r_id),
+            .dout(ar_align_fifo_dout)
+        );
+    end else begin : single_fifo
+        axiu_reorder_id_fifo #(
+            .LEN(MAX_OUTSTANDING_REQ),
+            .AXI_ID_WIDTH(AXI_ID_WIDTH),
+            .WIDTH($bits(RAlignInfo_t))
+        ) reorder_axi_id_fifo_I (
+            .clk(clk),
+            .arstn(arstn),
+            .full(ar_align_fifo_full),
+            .write(ar_align_fifo_write),
+            .din_id(slv.ar_id),
+            .din(ar_align_fifo_din),
+            .read(ar_align_fifo_read),
+            .dout_id(mst.r_id),
+            .dout(ar_align_fifo_dout)
+        );
+    end
 
     axiu_fifo_fallthrough #(
         .WIDTH($bits(WAlignInfo_t)),
