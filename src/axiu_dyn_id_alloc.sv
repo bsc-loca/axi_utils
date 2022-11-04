@@ -10,16 +10,24 @@ module axiu_dyn_id_alloc #(
     AXI_BUS.Master mst
 );
 
+    localparam SLV_AXI_ID_WIDTH = $clog2(SLV_UNIQUE_IDS);
+
     reg ar_stall;
+    reg [SLV_AXI_ID_WIDTH-1:0] ar_id_buf;
+    wire [SLV_AXI_ID_WIDTH-1:0] r_req_id_mapped;
     wire r_req_ready;
     reg aw_stall;
     wire w_req_ready;
+    reg [SLV_AXI_ID_WIDTH-1:0] aw_id_buf;
+    wire [SLV_AXI_ID_WIDTH-1:0] w_req_id_mapped;
 
     assign slv.ar_ready = mst.ar_ready && (ar_stall || r_req_ready);
     assign mst.ar_valid = slv.ar_valid && (ar_stall || r_req_ready);
 
     assign slv.aw_ready = mst.aw_ready && (aw_stall || w_req_ready);
     assign mst.aw_valid = slv.aw_valid && (aw_stall || w_req_ready);
+
+    assign mst.ar_id = ar_stall ? ar_id_buf : r_req_id_mapped;
 
     assign mst.ar_addr   = slv.ar_addr;
     assign mst.ar_len    = slv.ar_len;
@@ -30,6 +38,8 @@ module axiu_dyn_id_alloc #(
     assign mst.ar_prot   = slv.ar_prot;
     assign mst.ar_qos    = slv.ar_qos;
     assign mst.ar_region = slv.ar_region;
+
+    assign mst.aw_id = aw_stall ? aw_id_buf : w_req_id_mapped;
 
     assign mst.aw_addr   = slv.aw_addr;
     assign mst.aw_len    = slv.aw_len;
@@ -67,7 +77,7 @@ module axiu_dyn_id_alloc #(
         .req_valid(slv.ar_valid && !ar_stall),
         .req_ready(r_req_ready),
         .req_id(slv.ar_id),
-        .req_id_mapped(mst.ar_id),
+        .req_id_mapped(r_req_id_mapped),
         .resp_valid(mst.r_valid && slv.r_ready && mst.r_last),
         .resp_id(mst.r_id),
         .resp_id_mapped(slv.r_id)
@@ -83,11 +93,20 @@ module axiu_dyn_id_alloc #(
         .req_valid(slv.aw_valid && !aw_stall),
         .req_ready(w_req_ready),
         .req_id(slv.aw_id),
-        .req_id_mapped(mst.aw_id),
+        .req_id_mapped(w_req_id_mapped),
         .resp_valid(mst.b_valid && slv.b_ready),
         .resp_id(mst.b_id),
         .resp_id_mapped(slv.b_id)
     );
+
+    always_ff @(posedge clk) begin
+        if (!ar_stall) begin
+            ar_id_buf <= r_req_id_mapped;
+        end
+        if (!aw_stall) begin
+            aw_id_buf <= w_req_id_mapped;
+        end
+    end
 
     always_ff @(posedge clk or negedge arstn) begin
         if (!arstn) begin

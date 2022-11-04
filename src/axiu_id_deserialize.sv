@@ -24,6 +24,13 @@ module axiu_id_deserialize #(
     RDataBeat_t mst_rdata;
     RDataBeat_t slv_rdata;
 
+    reg ar_stall;
+    reg [AXI_ID_WIDTH-1:0] ar_id_buf;
+    wire [AXI_ID_WIDTH-1:0] r_req_id;
+    reg aw_stall;
+    reg [AXI_ID_WIDTH-1:0] aw_id_buf;
+    wire [AXI_ID_WIDTH-1:0] w_req_id;
+
     assign mst_rdata.data = mst.r_data;
     assign mst_rdata.resp = mst.r_resp;
     assign mst_rdata.last = mst.r_last;
@@ -34,6 +41,8 @@ module axiu_id_deserialize #(
     assign slv.aw_ready = mst.aw_ready;
     assign mst.aw_valid = slv.aw_valid;
 
+    assign mst.ar_id = ar_stall ? ar_id_buf : r_req_id;
+
     assign mst.ar_addr   = slv.ar_addr;
     assign mst.ar_len    = slv.ar_len;
     assign mst.ar_size   = slv.ar_size;
@@ -43,6 +52,8 @@ module axiu_id_deserialize #(
     assign mst.ar_prot   = slv.ar_prot;
     assign mst.ar_qos    = slv.ar_qos;
     assign mst.ar_region = slv.ar_region;
+
+    assign mst.aw_id = aw_stall ? aw_id_buf : w_req_id;
 
     assign mst.aw_addr   = slv.aw_addr;
     assign mst.aw_len    = slv.aw_len;
@@ -78,8 +89,8 @@ module axiu_id_deserialize #(
     ) axiu_deserialize_R_channel (
         .clk(clk),
         .arstn(arstn),
-        .req_valid(slv.ar_valid && mst.ar_ready),
-        .req_id(mst.ar_id),
+        .req_valid(slv.ar_valid && !ar_stall),
+        .req_id(r_req_id),
         .mst_resp_valid(mst.r_valid),
         .mst_resp_data(mst_rdata),
         .mst_resp_id(mst.r_id),
@@ -98,8 +109,8 @@ module axiu_id_deserialize #(
     ) axiu_deserialize_W_channel (
         .clk(clk),
         .arstn(arstn),
-        .req_valid(slv.aw_valid && mst.aw_ready),
-        .req_id(mst.aw_id),
+        .req_valid(slv.aw_valid && !aw_stall),
+        .req_id(w_req_id),
         .mst_resp_valid(mst.b_valid),
         .mst_resp_data(mst.b_resp),
         .mst_resp_id(mst.b_id),
@@ -108,5 +119,32 @@ module axiu_id_deserialize #(
         .slv_resp_data(slv.b_resp),
         .slv_resp_last(1'b1)
     );
+
+    always_ff @(posedge clk) begin
+        if (!ar_stall) begin
+            ar_id_buf <= r_req_id;
+        end
+        if (!aw_stall) begin
+            aw_id_buf <= w_req_id;
+        end
+    end
+
+    always_ff @(posedge clk or negedge arstn) begin
+        if (!arstn) begin
+            ar_stall <= 1'b0;
+            aw_stall <= 1'b0;
+        end else begin
+            if (slv.ar_valid && !mst.ar_ready) begin
+                ar_stall <= 1'b1;
+            end else if (mst.ar_ready) begin
+                ar_stall <= 1'b0;
+            end
+            if (slv.aw_valid && !mst.aw_ready) begin
+                aw_stall <= 1'b1;
+            end else if (mst.aw_ready) begin
+                aw_stall <= 1'b0;
+            end
+        end
+    end
 
 endmodule
