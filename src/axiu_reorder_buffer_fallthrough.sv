@@ -33,7 +33,10 @@ module axiu_reorder_buffer_fallthrough #(
 
     always @(posedge clk) begin
         if (write) begin
-            if (empty) begin
+            assert (!full) else begin
+                $error("Writing a full queue"); $fatal;
+            end
+            if (size == 0) begin
                 rand_idx = 0;
                 rand_id = id_in;
                 dout <= din;
@@ -45,13 +48,16 @@ module axiu_reorder_buffer_fallthrough #(
             dict[id_in].queue.push_back(din);
         end
         if (read) begin
+            assert (!empty) else begin
+                $error("Reading an empty queue"); $fatal;
+            end
             size -= 1;
             dict[rand_id].queue.pop_front();
             if (dict[rand_id].queue.size() == 0) begin
                 dict.delete(rand_id);
                 id_set.delete(rand_idx);
             end
-            if (!empty) begin
+            if (size != 0) begin
                 rand_idx = $urandom_range(id_set.size()-1);
                 rand_id = id_set[rand_idx];
                 dout <= dict[rand_id].queue[0];
