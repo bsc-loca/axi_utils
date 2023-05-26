@@ -9,11 +9,11 @@ module axiu_addr_w_conv #(
 );
 
     if (MST_AXI_ADDR_WIDTH <= SLV_AXI_ADDR_WIDTH) begin
-        assign mst.ar_addr = slv.ar_addr[MST_AXI_ADDR_WIDTH-1:0]; 
+        assign mst.ar_addr = slv.ar_addr[MST_AXI_ADDR_WIDTH-1:0];
         assign mst.aw_addr = slv.aw_addr[MST_AXI_ADDR_WIDTH-1:0];
     end else begin
         localparam WIDTH_DIFF = MST_AXI_ADDR_WIDTH-SLV_AXI_ADDR_WIDTH;
-        assign mst.ar_addr = {{WIDTH_DIFF{1'b0}}, slv.ar_addr} | ADDR_OFFSET; 
+        assign mst.ar_addr = {{WIDTH_DIFF{1'b0}}, slv.ar_addr} | ADDR_OFFSET;
         assign mst.aw_addr = {{WIDTH_DIFF{1'b0}}, slv.aw_addr} | ADDR_OFFSET;
     end
 
