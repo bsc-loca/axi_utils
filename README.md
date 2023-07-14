@@ -37,7 +37,7 @@ IDs are requested dynamically, so any AXI master can issue requets with any ID v
 | Name | Description |
 |------|-------------|
 | SLV_UNIQUE_IDS | Number of IDs that are issued in the slave side. Valid range is 1:2**SLV_ID_WIDTH. |
-| MST_UNIQUE_IDS | Number of IDs allocated dynamically. Values on the master side range 0:MST_UNIQUE_IDS-1. |
+| MST_UNIQUE_IDS | Number of IDs allocated dynamically. Values on the master side range 0:MST_UNIQUE_IDS-1. Must be a power of 2. |
 | MAX_TXNS_PER_ID | Max number of in-flight requests per each master ID. |
 
 ## Considerations
