@@ -5,10 +5,10 @@ module axiu_axilite_to_memport #(
     input clk,
     input rst,
     AXI_LITE.Slave axilite_port,
-    output memport_en,
-    output memport_we,
-    output [ADDR_WIDTH-1:0] memport_addr,
-    output [31:0] memport_din,
+    output logic memport_en,
+    output logic memport_we,
+    output logic [ADDR_WIDTH-1:0] memport_addr,
+    output logic [31:0] memport_din,
     input  [31:0] memport_dout
 
 );
