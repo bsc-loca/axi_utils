@@ -1,6 +1,7 @@
 
 module axiu_axilite_to_memport #(
-    parameter ADDR_WIDTH = 0
+    parameter int ADDR_WIDTH = 0,
+    parameter int DATA_WIDTH = 32
 ) (
     input clk,
     input rst,
@@ -8,8 +9,8 @@ module axiu_axilite_to_memport #(
     output logic memport_en,
     output logic memport_we,
     output logic [ADDR_WIDTH-1:0] memport_addr,
-    output logic [31:0] memport_din,
-    input  [31:0] memport_dout
+    output logic [DATA_WIDTH-1:0] memport_din,
+    input  [DATA_WIDTH-1:0] memport_dout
 
 );
 
