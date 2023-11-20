@@ -1,7 +1,8 @@
 
 module axiu_axilite_to_memport #(
     parameter int ADDR_WIDTH = 0,
-    parameter int DATA_WIDTH = 32
+    parameter int DATA_WIDTH = 32,
+    parameter int ADDR_SHIFT = 2
 ) (
     input clk,
     input rst,
@@ -31,8 +32,8 @@ module axiu_axilite_to_memport #(
     wire [ADDR_WIDTH-1:0] ar_mem_addr;
     wire [ADDR_WIDTH-1:0] aw_mem_addr;
 
-    assign ar_mem_addr = axilite_port.ar_addr[2 +: ADDR_WIDTH];
-    assign aw_mem_addr = axilite_port.aw_addr[2 +: ADDR_WIDTH];
+    assign ar_mem_addr = axilite_port.ar_addr[ADDR_SHIFT +: ADDR_WIDTH];
+    assign aw_mem_addr = axilite_port.aw_addr[ADDR_SHIFT +: ADDR_WIDTH];
 
     assign memport_din = axilite_port.w_data;
 
