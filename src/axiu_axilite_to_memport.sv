@@ -32,8 +32,8 @@ module axiu_axilite_to_memport #(
     wire [ADDR_WIDTH-1:0] ar_mem_addr;
     wire [ADDR_WIDTH-1:0] aw_mem_addr;
 
-    assign ar_mem_addr = axilite_port.ar_addr[ADDR_SHIFT +: ADDR_WIDTH];
-    assign aw_mem_addr = axilite_port.aw_addr[ADDR_SHIFT +: ADDR_WIDTH];
+    assign ar_mem_addr = {{ADDR_SHIFT{1'b0}},axilite_port.ar_addr[ADDR_SHIFT +: ADDR_WIDTH-ADDR_SHIFT]};
+    assign aw_mem_addr = {{ADDR_SHIFT{1'b0}},axilite_port.aw_addr[ADDR_SHIFT +: ADDR_WIDTH-ADDR_SHIFT]};
 
     assign memport_din = axilite_port.w_data;
 
