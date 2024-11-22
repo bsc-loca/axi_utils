@@ -2,7 +2,7 @@
 module axiu_axilite_to_memport #(
     parameter int ADDR_WIDTH = 0,
     parameter int DATA_WIDTH = 32,
-    parameter int ADDR_SHIFT = 2
+    parameter int ADDR_SHIFT = 0
 ) (
     input clk,
     input rst,
